@@ -35,7 +35,7 @@ def render():
             trans_sel = st.selectbox('Transportadora', trans_options)
             tipo_carga = st.text_input('Tipo de carga')
             peso = st.number_input('Peso (kg)', value=0.0)
-            custo = st.number_input('Valor de Frete', value=0.0)
+            valor_frete = st.number_input('Valor de Frete', value=0.0)
             status = st.selectbox('Status', ['planejada', 'em andamento', 'concluida', 'cancelada'])
             observacoes = st.text_area('Observações')
             submitted = st.form_submit_button('Salvar')
@@ -58,7 +58,7 @@ def render():
                     'transporter_id': transporter_id,
                     'tipo_carga': tipo_carga,
                     'peso': peso,
-                    'custo': custo,
+                    'valor_frete': valor_frete,
                     'status': status,
                     'observacoes': observacoes,
                 }
@@ -142,7 +142,7 @@ def render():
                     e_trans = st.selectbox('Transportadora', trans_opts, index=trans_opts.index(pre_trans) if pre_trans in trans_opts else 0)
                     e_tipo = st.text_input('Tipo de carga', value=trip.tipo_carga or '')
                     e_peso = st.number_input('Peso (kg)', value=trip.peso or 0.0)
-                    e_custo = st.number_input('Valor de Frete', value=trip.custo or 0.0)
+                    e_custo = st.number_input('Valor de Frete', value=trip.valor_frete or 0.0)
                     e_status = st.selectbox('Status', ['planejada', 'em andamento', 'concluida', 'cancelada'], index=0 if trip.status == 'planejada' else (1 if trip.status == 'em andamento' else (2 if trip.status == 'concluida' else 3)))
                     e_observacoes = st.text_area('Observações', value=trip.observacoes or '')
                     updated = st.form_submit_button('Salvar alterações')
@@ -165,7 +165,7 @@ def render():
                             'transporter_id': transporter_id,
                             'tipo_carga': e_tipo,
                             'peso': e_peso,
-                            'custo': e_custo,
+                            'valor_frete': e_custo,
                             'status': e_status,
                             'observacoes': e_observacoes,
                         }

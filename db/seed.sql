@@ -73,7 +73,7 @@ VALUES
 ('Motorista 20','10000000020','CNH0020','D','2027-08-20','+55 62 90001-1020','motorista20@empresa.com',20,'ativo','');
 
 -- Trips (20)
-INSERT INTO trips (origem, destino, data_saida, data_prevista_chegada, data_chegada, motorista_id, vehicle_id, transporter_id, tipo_carga, peso, custo, status, observacoes)
+INSERT INTO trips (origem, destino, data_saida, data_prevista_chegada, data_chegada, motorista_id, vehicle_id, transporter_id, tipo_carga, peso, valor_frete, status, observacoes)
 VALUES
 ('São Paulo','Rio de Janeiro','2024-01-05','2024-01-07','2024-01-07',1,1,1,'Carga Geral',1200.0,800.0,'concluida',''),
 ('Campinas','Belo Horizonte','2024-01-10','2024-01-13','2024-01-13',2,2,2,'Refrigerada',1500.0,950.0,'concluida',''),

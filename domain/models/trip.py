@@ -16,7 +16,7 @@ class Trip(Base):
     transporter_id = Column(Integer, ForeignKey('transporters.id'), nullable=True)
     tipo_carga = Column(String, nullable=True)
     peso = Column(Float, nullable=True)
-    custo = Column(Float, nullable=True)
+    valor_frete = Column(Float, nullable=True)
     status = Column(String, default='planejada')
     observacoes = Column(Text, nullable=True)
 
@@ -33,7 +33,7 @@ class Trip(Base):
             'transporter_id': self.transporter_id,
             'tipo_carga': self.tipo_carga,
             'peso': self.peso,
-            'custo': self.custo,
+            'valor_frete': self.valor_frete,
             'status': self.status,
             'observacoes': self.observacoes,
         }

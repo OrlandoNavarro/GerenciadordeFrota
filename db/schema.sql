@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS trips (
     transporter_id INTEGER,
     tipo_carga TEXT,
     peso REAL,
-    custo REAL,
+    valor_frete REAL,
     status TEXT DEFAULT 'planejada',
     observacoes TEXT,
     FOREIGN KEY(motorista_id) REFERENCES drivers(id),
