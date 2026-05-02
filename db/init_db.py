@@ -55,6 +55,14 @@ def init_db():
             'password': 'admin123',
             'role': 'admin',
         })
+    # Also create a simple test user 'admin' with password 'admin' for quick access
+    if not user_repo.get_by_email('admin'):
+        user_repo.create_user({
+            'email': 'admin',
+            'full_name': 'Administrador Teste',
+            'password': 'admin',
+            'role': 'admin',
+        })
     if not user_repo.get_by_email('user@local'):
         user_repo.create_user({
             'email': 'user@local',
