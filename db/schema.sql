@@ -1,4 +1,4 @@
--- Schema for fleet management
+-- Schema para Gerenciador de Frota
 PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS users (

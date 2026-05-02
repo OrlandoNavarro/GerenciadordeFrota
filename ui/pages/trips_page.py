@@ -5,6 +5,7 @@ from domain.services.driver_service import DriverService
 from domain.services.vehicle_service import VehicleService
 from domain.services.transporter_service import TransporterService
 from ui.components.data_table import render_table
+from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 
 
@@ -18,26 +19,50 @@ def render():
     vsvc = VehicleService(db)
     trsvc = TransporterService(db)
 
+    # Checar se há query param de edição
+    params = get_query_params()
+    edit_trip_id = None
+    edit_trip_obj = None
+    if params.get('edit_trip'):
+        try:
+            edit_trip_id = int(params.get('edit_trip')[0])
+            edit_trip_obj = tsvc.get_trip(edit_trip_id)
+        except Exception:
+            edit_trip_id = None
+            edit_trip_obj = None
+
     with tabs[0]:
         section('Cadastro de Viagem')
         with st.form('trip_form'):
-            origem = st.text_input('Origem')
-            destino = st.text_input('Destino')
-            data_saida = st.date_input('Data de saída')
+            origem = st.text_input('Origem', value=edit_trip_obj.origem if edit_trip_obj else '')
+            destino = st.text_input('Destino', value=edit_trip_obj.destino if edit_trip_obj else '')
+            data_saida = st.date_input('Data de saída', value=edit_trip_obj.data_saida if edit_trip_obj and edit_trip_obj.data_saida else None)
             motorista = dsvc.list_drivers()
             motorista_options = ['Nenhum'] + [f"{m.id} - {m.nome}" for m in motorista]
-            motorista_sel = st.selectbox('Motorista', motorista_options)
+            if edit_trip_obj and edit_trip_obj.motorista_id:
+                pre_driver = f"{edit_trip_obj.motorista_id} - {next((m.nome for m in motorista if m.id == edit_trip_obj.motorista_id), '')}"
+                motorista_sel = st.selectbox('Motorista', motorista_options, index=motorista_options.index(pre_driver) if pre_driver in motorista_options else 0)
+            else:
+                motorista_sel = st.selectbox('Motorista', motorista_options)
             veiculos = vsvc.list_vehicles()
             veic_options = ['Nenhum'] + [f"{v.id} - {v.placa}" for v in veiculos]
-            veic_sel = st.selectbox('Veículo', veic_options)
+            if edit_trip_obj and edit_trip_obj.vehicle_id:
+                pre_veic = f"{edit_trip_obj.vehicle_id} - {next((v.placa for v in veiculos if v.id == edit_trip_obj.vehicle_id), '')}"
+                veic_sel = st.selectbox('Veículo', veic_options, index=veic_options.index(pre_veic) if pre_veic in veic_options else 0)
+            else:
+                veic_sel = st.selectbox('Veículo', veic_options)
             transporters = trsvc.list_transporters()
             trans_options = ['Nenhum'] + [f"{t.id} - {t.razao_social}" for t in transporters]
-            trans_sel = st.selectbox('Transportadora', trans_options)
-            tipo_carga = st.text_input('Tipo de carga')
-            peso = st.number_input('Peso (kg)', value=0.0)
-            valor_frete = st.number_input('Valor de Frete', value=0.0)
-            status = st.selectbox('Status', ['planejada', 'em andamento', 'concluida', 'cancelada'])
-            observacoes = st.text_area('Observações')
+            if edit_trip_obj and edit_trip_obj.transporter_id:
+                pre_trans = f"{edit_trip_obj.transporter_id} - {next((t.razao_social for t in transporters if t.id == edit_trip_obj.transporter_id), '')}"
+                trans_sel = st.selectbox('Transportadora', trans_options, index=trans_options.index(pre_trans) if pre_trans in trans_options else 0)
+            else:
+                trans_sel = st.selectbox('Transportadora', trans_options)
+            tipo_carga = st.text_input('Tipo de carga', value=edit_trip_obj.tipo_carga if edit_trip_obj else '')
+            peso = st.number_input('Peso (kg)', value=edit_trip_obj.peso or 0.0 if edit_trip_obj else 0.0)
+            valor_frete = st.number_input('Valor de Frete', value=edit_trip_obj.valor_frete or 0.0 if edit_trip_obj else 0.0)
+            status = st.selectbox('Status', ['planejada', 'em andamento', 'concluida', 'cancelada'], index=0 if (edit_trip_obj and edit_trip_obj.status == 'planejada') else 0)
+            observacoes = st.text_area('Observações', value=edit_trip_obj.observacoes if edit_trip_obj else '')
             submitted = st.form_submit_button('Salvar')
             if submitted:
                 motorista_id = None
@@ -63,9 +88,22 @@ def render():
                     'observacoes': observacoes,
                 }
                 try:
-                    tsvc.create_trip(payload)
-                    db.commit()
-                    st.success('Viagem cadastrada com sucesso')
+                    if edit_trip_obj:
+                        tsvc.update_trip(edit_trip_obj.id, payload)
+                        db.commit()
+                        try:
+                            st.query_params.clear()
+                        except Exception:
+                            pass
+                        st.success('Viagem atualizada')
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+                    else:
+                        tsvc.create_trip(payload)
+                        db.commit()
+                        st.success('Viagem cadastrada com sucesso')
                 except Exception as e:
                     db.rollback()
                     st.error(str(e))
@@ -99,11 +137,25 @@ def render():
             trips = tsvc.list_trips()
 
         rows = [t.to_dict() for t in trips]
-        render_table(rows, columns=['id', 'origem', 'destino', 'data_saida', 'status', 'transporter_id'])
+        render_table(rows, columns=['id', 'origem', 'destino', 'data_saida', 'status', 'transporter_id'], entity='trip')
+
+        params = get_query_params()
+        edit_id = None
+        if params.get('edit_trip'):
+            try:
+                edit_id = int(params.get('edit_trip')[0])
+            except Exception:
+                edit_id = None
 
         options = [f"{t.id} - {t.origem} -> {t.destino}" for t in trips]
         if options:
-            sel = st.selectbox('Selecionar viagem para editar', options, key='sel_trip')
+            index = 0
+            if edit_id is not None:
+                for i, t in enumerate(trips):
+                    if t.id == edit_id:
+                        index = i
+                        break
+            sel = st.selectbox('Selecionar viagem para editar', options, index=index, key='sel_trip')
             sel_id = int(sel.split(' - ')[0])
             trip = tsvc.get_trip(sel_id)
             if trip:

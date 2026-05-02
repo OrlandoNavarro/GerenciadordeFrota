@@ -3,6 +3,7 @@ from config.database import SessionLocal
 from domain.services.vehicle_service import VehicleService
 from domain.services.transporter_service import TransporterService
 from ui.components.data_table import render_table
+from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 
 
@@ -14,22 +15,38 @@ def render():
     vsvc = VehicleService(db)
     tsvc = TransporterService(db)
 
+    # Checar se há query param de edição
+    params = get_query_params()
+    edit_vehicle_id = None
+    edit_vehicle_obj = None
+    if params.get('edit_vehicle'):
+        try:
+            edit_vehicle_id = int(params.get('edit_vehicle')[0])
+            edit_vehicle_obj = vsvc.get_vehicle(edit_vehicle_id)
+        except Exception:
+            edit_vehicle_id = None
+            edit_vehicle_obj = None
+
     with tabs[0]:
         section('Cadastro de Veículo')
         with st.form('vehicle_form'):
-            placa = st.text_input('Placa')
-            tipo = st.text_input('Tipo')
-            modelo = st.text_input('Modelo')
-            marca = st.text_input('Marca')
-            ano = st.number_input('Ano', min_value=1900, max_value=2100, value=2020)
-            capacidade = st.number_input('Capacidade', value=0.0, format='%.2f')
-            combustivel = st.selectbox('Combustível', ['Diesel', 'Gasolina', 'Elétrico', 'Flex', 'GNV'])
-            consumo_medio = st.number_input('Consumo médio (km/L)', value=0.0, format='%.2f')
+            placa = st.text_input('Placa', value=edit_vehicle_obj.placa if edit_vehicle_obj else '')
+            tipo = st.text_input('Tipo', value=edit_vehicle_obj.tipo if edit_vehicle_obj else '')
+            modelo = st.text_input('Modelo', value=edit_vehicle_obj.modelo if edit_vehicle_obj else '')
+            marca = st.text_input('Marca', value=edit_vehicle_obj.marca if edit_vehicle_obj else '')
+            ano = st.number_input('Ano', min_value=1900, max_value=2100, value=edit_vehicle_obj.ano or 2020 if edit_vehicle_obj else 2020)
+            capacidade = st.number_input('Capacidade', value=edit_vehicle_obj.capacidade or 0.0 if edit_vehicle_obj else 0.0, format='%.2f')
+            combustivel = st.selectbox('Combustível', ['Diesel', 'Gasolina', 'Elétrico', 'Flex', 'GNV'], index=0)
+            consumo_medio = st.number_input('Consumo médio (km/L)', value=edit_vehicle_obj.consumo_medio or 0.0 if edit_vehicle_obj else 0.0, format='%.2f')
             transporters = tsvc.list_transporters()
             trans_options = ['Nenhuma'] + [f"{t.id} - {t.razao_social}" for t in transporters]
-            selected_trans = st.selectbox('Transportadora', trans_options)
-            status = st.selectbox('Status', ['ativo', 'inativo'])
-            observacoes = st.text_area('Observações')
+            if edit_vehicle_obj and edit_vehicle_obj.transporter_id:
+                pre_sel = f"{edit_vehicle_obj.transporter_id} - {next((t.razao_social for t in transporters if t.id == edit_vehicle_obj.transporter_id), '')}"
+                selected_trans = st.selectbox('Transportadora', trans_options, index=trans_options.index(pre_sel) if pre_sel in trans_options else 0)
+            else:
+                selected_trans = st.selectbox('Transportadora', trans_options)
+            status = st.selectbox('Status', ['ativo', 'inativo'], index=0 if (edit_vehicle_obj and edit_vehicle_obj.status == 'ativo') else 1)
+            observacoes = st.text_area('Observações', value=edit_vehicle_obj.observacoes if edit_vehicle_obj else '')
             submitted = st.form_submit_button('Salvar')
             if submitted:
                 transporter_id = None
@@ -49,9 +66,22 @@ def render():
                     'observacoes': observacoes,
                 }
                 try:
-                    v = vsvc.create_vehicle(payload)
-                    db.commit()
-                    st.success('Veículo cadastrado com sucesso')
+                    if edit_vehicle_obj:
+                        vsvc.update_vehicle(edit_vehicle_obj.id, payload)
+                        db.commit()
+                        try:
+                            st.query_params.clear()
+                        except Exception:
+                            pass
+                        st.success('Veículo atualizado')
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+                    else:
+                        v = vsvc.create_vehicle(payload)
+                        db.commit()
+                        st.success('Veículo cadastrado com sucesso')
                 except Exception as e:
                     db.rollback()
                     st.error(str(e))
@@ -81,11 +111,25 @@ def render():
             vehicles = vsvc.list_vehicles()
 
         rows = [v.to_dict() for v in vehicles]
-        render_table(rows, columns=['id', 'placa', 'modelo', 'marca', 'ano', 'status', 'transporter_id'])
+        render_table(rows, columns=['id', 'placa', 'modelo', 'marca', 'ano', 'status', 'transporter_id'], entity='vehicle')
+
+        params = get_query_params()
+        edit_id = None
+        if params.get('edit_vehicle'):
+            try:
+                edit_id = int(params.get('edit_vehicle')[0])
+            except Exception:
+                edit_id = None
 
         options = [f"{v.id} - {v.placa} - {v.modelo or ''}" for v in vehicles]
         if options:
-            sel = st.selectbox('Selecionar veículo para editar', options, key='sel_vehicle')
+            index = 0
+            if edit_id is not None:
+                for i, v in enumerate(vehicles):
+                    if v.id == edit_id:
+                        index = i
+                        break
+            sel = st.selectbox('Selecionar veículo para editar', options, index=index, key='sel_vehicle')
             sel_id = int(sel.split(' - ')[0])
             vehicle = vsvc.get_vehicle(sel_id)
             if vehicle:

@@ -5,7 +5,7 @@ from core.session import login_user, safe_rerun
 
 
 def render():
-    st.set_page_config(page_title='Login - Fleet Management')
+    st.set_page_config(page_title='Login - Gerenciador de Frota')
     st.markdown('<div style="display:flex;justify-content:center;align-items:center;height:70vh">', unsafe_allow_html=True)
     with st.container():
         st.markdown('<div class="card" style="max-width:420px;margin:0 auto;padding:24px">', unsafe_allow_html=True)

@@ -3,6 +3,7 @@ from config.database import SessionLocal
 from domain.services.driver_service import DriverService
 from domain.services.transporter_service import TransporterService
 from ui.components.data_table import render_table
+from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 
 
@@ -13,22 +14,37 @@ def render():
     db = SessionLocal()
     dsvc = DriverService(db)
     tsvc = TransporterService(db)
-
+    # Checar se há query param de edição e carregar registro
+    params = get_query_params()
+    edit_driver_id = None
+    edit_driver_obj = None
+    if params.get('edit_driver'):
+        try:
+            edit_driver_id = int(params.get('edit_driver')[0])
+            edit_driver_obj = dsvc.get_driver(edit_driver_id)
+        except Exception:
+            edit_driver_id = None
+            edit_driver_obj = None
     with tabs[0]:
         section('Cadastro de Motorista')
         with st.form('driver_form'):
-            nome = st.text_input('Nome')
-            cpf = st.text_input('CPF')
-            cnh = st.text_input('CNH')
-            categoria = st.text_input('Categoria')
-            validade_cnh = st.date_input('Validade CNH')
-            telefone = st.text_input('Telefone')
-            email = st.text_input('E-mail')
+            nome = st.text_input('Nome', value=edit_driver_obj.nome if edit_driver_obj else '')
+            cpf = st.text_input('CPF', value=edit_driver_obj.cpf if edit_driver_obj else '')
+            cnh = st.text_input('CNH', value=edit_driver_obj.cnh if edit_driver_obj else '')
+            categoria = st.text_input('Categoria', value=edit_driver_obj.categoria if edit_driver_obj else '')
+            validade_cnh = st.date_input('Validade CNH', value=(edit_driver_obj.validade_cnh if edit_driver_obj and edit_driver_obj.validade_cnh else None))
+            telefone = st.text_input('Telefone', value=edit_driver_obj.telefone if edit_driver_obj else '')
+            email = st.text_input('E-mail', value=edit_driver_obj.email if edit_driver_obj else '')
             transporters = tsvc.list_transporters()
             trans_options = ['Nenhuma'] + [f"{t.id} - {t.razao_social}" for t in transporters]
-            selected_trans = st.selectbox('Transportadora', trans_options)
-            status = st.selectbox('Status', ['ativo', 'inativo'])
-            observacoes = st.text_area('Observações')
+            # pre-selecionar transportadora se estiver em modo edição
+            if edit_driver_obj and edit_driver_obj.transporter_id:
+                pre_sel = f"{edit_driver_obj.transporter_id} - {next((t.razao_social for t in transporters if t.id == edit_driver_obj.transporter_id), '')}"
+                selected_trans = st.selectbox('Transportadora', trans_options, index=trans_options.index(pre_sel) if pre_sel in trans_options else 0)
+            else:
+                selected_trans = st.selectbox('Transportadora', trans_options)
+            status = st.selectbox('Status', ['ativo', 'inativo'], index=0 if (edit_driver_obj and edit_driver_obj.status == 'ativo') else 1)
+            observacoes = st.text_area('Observações', value=edit_driver_obj.observacoes if edit_driver_obj else '')
             submitted = st.form_submit_button('Salvar')
             if submitted:
                 transporter_id = None
@@ -47,9 +63,23 @@ def render():
                     'observacoes': observacoes,
                 }
                 try:
-                    d = dsvc.create_driver(payload)
-                    db.commit()
-                    st.success('Motorista cadastrado com sucesso')
+                    if edit_driver_obj:
+                        dsvc.update_driver(edit_driver_obj.id, payload)
+                        db.commit()
+                        # limpar query params para sair do modo edição
+                        try:
+                            st.query_params.clear()
+                        except Exception:
+                            pass
+                        st.success('Motorista atualizado')
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+                    else:
+                        d = dsvc.create_driver(payload)
+                        db.commit()
+                        st.success('Motorista cadastrado com sucesso')
                 except Exception as e:
                     db.rollback()
                     st.error(str(e))
@@ -83,11 +113,27 @@ def render():
             drivers = dsvc.list_drivers()
 
         rows = [d.to_dict() for d in drivers]
-        render_table(rows, columns=['id', 'nome', 'cpf', 'cnh', 'status', 'transporter_id'])
+        render_table(rows, columns=['id', 'nome', 'cpf', 'cnh', 'status', 'transporter_id'], entity='driver')
+
+        # suportar clique no ícone de editar via query param: ?edit_driver=<id>
+        params = get_query_params()
+        edit_id = None
+        if params.get('edit_driver'):
+            try:
+                edit_id = int(params.get('edit_driver')[0])
+            except Exception:
+                edit_id = None
 
         options = [f"{d.id} - {d.nome} - {d.cpf}" for d in drivers]
         if options:
-            sel = st.selectbox('Selecionar motorista para editar', options, key='sel_driver')
+            # se vier edit_id, pré-seleciona o índice correspondente
+            index = 0
+            if edit_id is not None:
+                for i, d in enumerate(drivers):
+                    if d.id == edit_id:
+                        index = i
+                        break
+            sel = st.selectbox('Selecionar motorista para editar', options, index=index, key='sel_driver')
             sel_id = int(sel.split(' - ')[0])
             driver = dsvc.get_driver(sel_id)
             if driver:

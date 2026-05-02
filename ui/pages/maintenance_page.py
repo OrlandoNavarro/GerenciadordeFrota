@@ -3,6 +3,7 @@ from config.database import SessionLocal
 from domain.services.maintenance_service import MaintenanceService
 from domain.services.vehicle_service import VehicleService
 from ui.components.data_table import render_table
+from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 from datetime import date
 
@@ -15,20 +16,37 @@ def render():
     msvc = MaintenanceService(db)
     vsvc = VehicleService(db)
 
+    # Checar se há query param de edição
+    params = get_query_params()
+    edit_maint_id = None
+    edit_maint_obj = None
+    if params.get('edit_maintenance'):
+        try:
+            edit_maint_id = int(params.get('edit_maintenance')[0])
+            edit_maint_obj = msvc.get_maintenance(edit_maint_id)
+        except Exception:
+            edit_maint_id = None
+            edit_maint_obj = None
+
     with tabs[0]:
         section('Agendar / Registrar Manutenção')
         with st.form('maint_form'):
             veiculos = vsvc.list_vehicles()
             veic_options = ['Nenhum'] + [f"{v.id} - {v.placa}" for v in veiculos]
-            veic = st.selectbox('Veículo', veic_options)
-            tipo = st.text_input('Tipo')
-            data = st.date_input('Data', value=date.today())
-            oficina = st.text_input('Oficina')
-            custo = st.number_input('Custo', value=0.0, min_value=0.0, format="%.2f")
-            descricao = st.text_area('Descrição')
-            status = st.selectbox('Status', ['aberto', 'em andamento', 'concluida'])
-            proxima = st.date_input('Próxima revisão', value=None)
-            observacoes = st.text_area('Observações')
+            # pré-selecionar se em modo edição
+            if edit_maint_obj and edit_maint_obj.vehicle_id:
+                pre_veic = f"{edit_maint_obj.vehicle_id} - {next((v.placa for v in veiculos if v.id == edit_maint_obj.vehicle_id), '')}"
+                veic = st.selectbox('Veículo', veic_options, index=veic_options.index(pre_veic) if pre_veic in veic_options else 0)
+            else:
+                veic = st.selectbox('Veículo', veic_options)
+            tipo = st.text_input('Tipo', value=edit_maint_obj.tipo if edit_maint_obj else '')
+            data = st.date_input('Data', value=edit_maint_obj.data if edit_maint_obj and edit_maint_obj.data else date.today())
+            oficina = st.text_input('Oficina', value=edit_maint_obj.oficina if edit_maint_obj else '')
+            custo = st.number_input('Custo', value=edit_maint_obj.custo or 0.0 if edit_maint_obj else 0.0, min_value=0.0, format="%.2f")
+            descricao = st.text_area('Descrição', value=edit_maint_obj.descricao if edit_maint_obj else '')
+            status = st.selectbox('Status', ['aberto', 'em andamento', 'concluida'], index=0 if (edit_maint_obj and edit_maint_obj.status == 'aberto') else 0)
+            proxima = st.date_input('Próxima revisão', value=edit_maint_obj.proxima_revisao if edit_maint_obj and edit_maint_obj.proxima_revisao else None)
+            observacoes = st.text_area('Observações', value=edit_maint_obj.observacoes if edit_maint_obj else '')
             submitted = st.form_submit_button('Salvar')
             if submitted:
                 vehicle_id = None
@@ -46,9 +64,22 @@ def render():
                     'observacoes': observacoes,
                 }
                 try:
-                    msvc.create_maintenance(payload)
-                    db.commit()
-                    st.success('Manutenção registrada')
+                    if edit_maint_obj:
+                        msvc.update_maintenance(edit_maint_obj.id, payload)
+                        db.commit()
+                        try:
+                            st.query_params.clear()
+                        except Exception:
+                            pass
+                        st.success('Manutenção atualizada')
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+                    else:
+                        msvc.create_maintenance(payload)
+                        db.commit()
+                        st.success('Manutenção registrada')
                 except Exception as e:
                     db.rollback()
                     st.error(str(e))
@@ -79,11 +110,25 @@ def render():
             maints = msvc.list_maintenances()
 
         rows = [m.to_dict() for m in maints]
-        render_table(rows, columns=['id', 'vehicle_id', 'tipo', 'data', 'status', 'custo'])
+        render_table(rows, columns=['id', 'vehicle_id', 'tipo', 'data', 'status', 'custo'], entity='maintenance')
+
+        params = get_query_params()
+        edit_id = None
+        if params.get('edit_maintenance'):
+            try:
+                edit_id = int(params.get('edit_maintenance')[0])
+            except Exception:
+                edit_id = None
 
         options = [f"{m.id} - {m.tipo or '-'} | {m.data}" for m in maints]
         if options:
-            sel = st.selectbox('Selecionar manutenção', options, key='sel_maint')
+            index = 0
+            if edit_id is not None:
+                for i, m in enumerate(maints):
+                    if m.id == edit_id:
+                        index = i
+                        break
+            sel = st.selectbox('Selecionar manutenção', options, index=index, key='sel_maint')
             sel_id = int(sel.split(' - ')[0])
             maint = msvc.get_maintenance(sel_id)
             if maint:
