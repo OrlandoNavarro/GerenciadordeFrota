@@ -20,6 +20,12 @@ class Fueling(Base):
         return {
             'id': self.id,
             'data': self.data,
+            'vehicle_id': self.vehicle_id,
+            'motorista_id': self.motorista_id,
+            'posto': self.posto,
             'litros': self.litros,
             'valor_total': self.valor_total,
+            'valor_por_litro': self.valor_por_litro,
+            'km_atual': self.km_atual,
+            'observacoes': self.observacoes,
         }
