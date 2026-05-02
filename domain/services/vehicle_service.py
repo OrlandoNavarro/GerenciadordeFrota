@@ -13,3 +13,12 @@ class VehicleService:
 
     def list_vehicles(self, filters: dict | None = None):
         return self.repo.list(filters)
+
+    def get_vehicle(self, id: int):
+        return self.repo.get(id)
+
+    def update_vehicle(self, id: int, payload: dict):
+        return self.repo.update(id, payload)
+
+    def delete_vehicle(self, id: int):
+        return self.repo.delete(id)

@@ -42,3 +42,25 @@ class VehicleRepository:
             if 'status' in filters:
                 q = q.filter(Vehicle.status == filters['status'])
         return q.order_by(Vehicle.id.desc()).all()
+
+    def update(self, id: int, payload: dict):
+        v = self.get(id)
+        if not v:
+            return None
+        if 'placa' in payload:
+            existing = self.get_by_plate(payload['placa'])
+            if existing and existing.id != id:
+                raise ValueError('Placa já existe')
+        for k, val in payload.items():
+            if hasattr(v, k) and k != 'id':
+                setattr(v, k, val)
+        self.db.flush()
+        return v
+
+    def delete(self, id: int):
+        v = self.get(id)
+        if not v:
+            return False
+        v.status = 'inativo'
+        self.db.flush()
+        return True
