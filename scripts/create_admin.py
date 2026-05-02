@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from config.database import SessionLocal
 from domain.repositories.user_repository import UserRepository
 

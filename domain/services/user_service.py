@@ -16,7 +16,18 @@ class UserService:
         user = self.repo.get_by_email(email)
         if not user:
             return None
-        from passlib.hash import bcrypt
-        if not bcrypt.verify(password, user.password_hash):
+        # Support multiple password storage strategies for development:
+        # - bcrypt hashes (standard, verified via core.auth.verify_password)
+        # - plain:... prefix (development fallback)
+        pw = getattr(user, 'password_hash', '') or ''
+        if pw.startswith('plain:'):
+            expected = pw.split(':', 1)[1]
+            if password == expected:
+                return user
+            return None
+
+        # Fallback to bcrypt verification (wrapped to handle missing libs)
+        from core.auth import verify_password
+        if not verify_password(password, pw):
             return None
         return user
