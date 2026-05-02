@@ -110,7 +110,135 @@ def render():
             maints = msvc.list_maintenances()
 
         rows = [m.to_dict() for m in maints]
-        render_table(rows, columns=['id', 'vehicle_id', 'tipo', 'data', 'status', 'custo'], entity='maintenance')
+            # Paginação
+            rows_all = [m.to_dict() for m in maints]
+            page_size = 10
+            page_key = 'page_maintenance'
+            if page_key not in st.session_state:
+                st.session_state[page_key] = 1
+            params = get_query_params()
+            if params.get(page_key):
+                try:
+                    st.session_state[page_key] = int(params.get(page_key)[0])
+                except Exception:
+                    pass
+
+            total_pages = max(1, math.ceil(len(rows_all) / page_size))
+            if total_pages > 1:
+                cols_pag = st.columns(total_pages)
+                for i, c in enumerate(cols_pag):
+                    with c:
+                        if st.button(str(i + 1), key=f'page_maintenance_btn_{i+1}'):
+                            st.session_state[page_key] = i + 1
+                            try:
+                                st.rerun()
+                            except Exception:
+                                pass
+
+            page = max(1, min(st.session_state.get(page_key, 1), total_pages))
+            start = (page - 1) * page_size
+            paginated = maints[start:start + page_size]
+
+            render_table([m.to_dict() for m in paginated], columns=['id','vehicle_id','descricao','data','valor','status'], entity='maintenance')
+
+            params = get_query_params()
+            edit_id = None
+            if params.get('edit_maintenance'):
+                try:
+                    edit_id = int(params.get('edit_maintenance')[0])
+                except Exception:
+                    edit_id = None
+
+            options = [f"{m.id} - {m.descricao[:30]}" for m in maints]
+            if edit_id is not None:
+                sel_id = edit_id
+                m = msvc.get_maintenance(sel_id)
+                if m:
+                    st.markdown('### Editar Manutenção')
+                    vehicles_list = vsvc.list_vehicles()
+                    veh_options = ['Nenhum'] + [f"{v.id} - {v.placa}" for v in vehicles_list]
+                    pre_sel = 'Nenhum'
+                    if m.vehicle_id:
+                        for v in vehicles_list:
+                            if v.id == m.vehicle_id:
+                                pre_sel = f"{v.id} - {v.placa}"
+                                break
+
+                    with st.form('edit_maint_form_inline'):
+                        e_vehicle = st.selectbox('Veículo', veh_options, index=veh_options.index(pre_sel) if pre_sel in veh_options else 0)
+                        e_desc = st.text_area('Descrição', value=m.descricao or '')
+                        e_data = st.date_input('Data', value=m.data)
+                        e_valor = st.number_input('Valor', value=m.valor or 0.0, format='%.2f')
+                        e_status = st.selectbox('Status', ['pendente','concluida'], index=0 if m.status == 'pendente' else 1)
+                        updated = st.form_submit_button('Salvar alterações')
+                        if updated:
+                            vehicle_id = None
+                            if e_vehicle != 'Nenhum':
+                                vehicle_id = int(e_vehicle.split(' - ')[0])
+                            payload = {
+                                'vehicle_id': vehicle_id,
+                                'descricao': e_desc,
+                                'data': e_data,
+                                'valor': float(e_valor),
+                                'status': e_status,
+                            }
+                            try:
+                                msvc.update_maintenance(sel_id, payload)
+                                db.commit()
+                                try:
+                                    st.query_params.clear()
+                                except Exception:
+                                    pass
+                                st.success('Manutenção atualizada')
+                                try:
+                                    st.rerun()
+                                except Exception:
+                                    pass
+                            except Exception as e:
+                                db.rollback()
+                                st.error(str(e))
+            else:
+                if options:
+                    index = 0
+                    sel = st.selectbox('Selecionar manutenção para editar', options, index=index, key='sel_maint')
+                    sel_id = int(sel.split(' - ')[0])
+                    m = msvc.get_maintenance(sel_id)
+                    if m:
+                        st.markdown('### Editar Manutenção')
+                        vehicles_list = vsvc.list_vehicles()
+                        veh_options = ['Nenhum'] + [f"{v.id} - {v.placa}" for v in vehicles_list]
+                        pre_sel = 'Nenhum'
+                        if m.vehicle_id:
+                            for v in vehicles_list:
+                                if v.id == m.vehicle_id:
+                                    pre_sel = f"{v.id} - {v.placa}"
+                                    break
+
+                        with st.form('edit_maint_form'):
+                            e_vehicle = st.selectbox('Veículo', veh_options, index=veh_options.index(pre_sel) if pre_sel in veh_options else 0)
+                            e_desc = st.text_area('Descrição', value=m.descricao or '')
+                            e_data = st.date_input('Data', value=m.data)
+                            e_valor = st.number_input('Valor', value=m.valor or 0.0, format='%.2f')
+                            e_status = st.selectbox('Status', ['pendente','concluida'], index=0 if m.status == 'pendente' else 1)
+                            updated = st.form_submit_button('Salvar alterações')
+                            if updated:
+                                vehicle_id = None
+                                if e_vehicle != 'Nenhum':
+                                    vehicle_id = int(e_vehicle.split(' - ')[0])
+                                payload = {
+                                    'vehicle_id': vehicle_id,
+                                    'descricao': e_desc,
+                                    'data': e_data,
+                                    'valor': float(e_valor),
+                                    'status': e_status,
+                                }
+                                try:
+                                    msvc.update_maintenance(sel_id, payload)
+                                    db.commit()
+                                    st.success('Manutenção atualizada')
+                                except Exception as e:
+                                    db.rollback()
+                                    st.error(str(e))
 
         params = get_query_params()
         edit_id = None

@@ -1,4 +1,5 @@
 import streamlit as st
+import math
 from config.database import SessionLocal
 from domain.services.transporter_service import TransporterService
 from ui.components.data_table import render_table
@@ -92,14 +93,42 @@ def render():
                 filters['cnpj'] = f_cnpj
             if f_cidade:
                 filters['cidade'] = f_cidade
-            rows = [t.to_dict() for t in svc.list_transporters(filters)]
-            render_table(rows, columns=['id','razao_social','nome_fantasia','cnpj','responsavel','telefone','cidade','estado','status'], entity='transporter')
+            transporters = svc.list_transporters(filters)
         else:
-            rows = [t.to_dict() for t in svc.list_transporters()]
-            render_table(rows, columns=['id','razao_social','nome_fantasia','cnpj','responsavel','telefone','cidade','estado','status'], entity='transporter')
+            transporters = svc.list_transporters()
+
+        # Paginação
+        rows_all = [t.to_dict() for t in transporters]
+        page_size = 10
+        page_key = 'page_transporter'
+        if page_key not in st.session_state:
+            st.session_state[page_key] = 1
+        params = get_query_params()
+        if params.get(page_key):
+            try:
+                st.session_state[page_key] = int(params.get(page_key)[0])
+            except Exception:
+                pass
+
+        total_pages = max(1, math.ceil(len(rows_all) / page_size))
+        if total_pages > 1:
+            cols_pag = st.columns(total_pages)
+            for i, c in enumerate(cols_pag):
+                with c:
+                    if st.button(str(i + 1), key=f'page_transporter_btn_{i+1}'):
+                        st.session_state[page_key] = i + 1
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+
+        page = max(1, min(st.session_state.get(page_key, 1), total_pages))
+        start = (page - 1) * page_size
+        paginated = transporters[start:start + page_size]
+
+        render_table([t.to_dict() for t in paginated], columns=['id','razao_social','nome_fantasia','cnpj','responsavel','telefone','cidade','estado','status'], entity='transporter')
 
         # suportar edição rápida via query param ?edit_transporter=<id>
-        params = get_query_params()
         edit_id = None
         if params.get('edit_transporter'):
             try:
@@ -111,7 +140,7 @@ def render():
             tr = svc.get_transporter(edit_id)
             if tr:
                 st.markdown('### Editar Transportadora')
-                with st.form('edit_transp_form'):
+                with st.form('edit_transp_form_inline'):
                     e_razao = st.text_input('Razão Social', value=tr.razao_social or '')
                     e_fantasia = st.text_input('Nome Fantasia', value=tr.nome_fantasia or '')
                     e_cnpj = st.text_input('CNPJ', value=tr.cnpj or '')
@@ -138,7 +167,15 @@ def render():
                         }
                         try:
                             svc.update_transporter(edit_id, payload)
+                            try:
+                                st.query_params.clear()
+                            except Exception:
+                                pass
                             st.success('Transportadora atualizada')
+                            try:
+                                st.rerun()
+                            except Exception:
+                                pass
                         except Exception as e:
                             st.error(str(e))
 

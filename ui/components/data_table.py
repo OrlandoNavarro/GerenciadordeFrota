@@ -23,8 +23,16 @@ def render_table(rows: list[dict], columns: list[str] | None = None, entity: str
     # If entity provided and id column exists, render HTML table with Edit links
     if entity and 'id' in df.columns:
         # build edit column with anchor links that set a query param
+        # try to preserve current page if available in session state
+        page_key = f'page_{entity}'
+        current_page = 1
         try:
-            edit_col = df['id'].apply(lambda x: f'<a href="?edit_{entity}={x}" style="text-decoration:none;color:#000;">✎</a>')
+            current_page = int(st.session_state.get(page_key, 1))
+        except Exception:
+            current_page = 1
+
+        try:
+            edit_col = df['id'].apply(lambda x: f'<a href="?edit_{entity}={x}&page_{entity}={current_page}" style="text-decoration:none;color:#000;">✎</a>')
         except Exception:
             edit_col = df['id'].apply(lambda x: '✎')
 
