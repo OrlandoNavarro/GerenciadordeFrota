@@ -21,5 +21,11 @@ class Maintenance(Base):
             'id': self.id,
             'vehicle_id': self.vehicle_id,
             'tipo': self.tipo,
+            'data': self.data,
+            'oficina': self.oficina,
+            'custo': self.custo,
+            'descricao': self.descricao,
             'status': self.status,
+            'proxima_revisao': self.proxima_revisao,
+            'observacoes': self.observacoes,
         }
