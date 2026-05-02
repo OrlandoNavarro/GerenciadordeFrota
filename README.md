@@ -7,10 +7,10 @@ Instalação rápida:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r fleet_management/requirements.txt
-cp fleet_management/.env.example .env
-python fleet_management/db/init_db.py
-streamlit run fleet_management/app.py
+pip install -r requirements.txt
+cp .env.example .env
+python db/init_db.py
+streamlit run app.py
 ```
 
 Usuários de teste (criador automático): `admin@local` / `admin123`, `user@local` / `user123`.
