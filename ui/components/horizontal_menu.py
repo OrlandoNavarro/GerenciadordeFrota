@@ -1,5 +1,6 @@
 import streamlit as st
 from core.navigation import get_menu_items
+from core.session import safe_rerun
 
 
 def render_menu(active: str | None = None):
@@ -10,4 +11,4 @@ def render_menu(active: str | None = None):
         with cols[i]:
             if st.button(label):
                 st.session_state['page'] = key
-                st.experimental_rerun()
+                safe_rerun()

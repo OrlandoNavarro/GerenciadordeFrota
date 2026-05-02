@@ -1,7 +1,7 @@
 import streamlit as st
 from config.database import SessionLocal
 from domain.services.user_service import UserService
-from core.session import login_user
+from core.session import login_user, safe_rerun
 
 
 def render():
@@ -27,4 +27,4 @@ def render():
                 else:
                     login_user(user.to_dict())
                     st.success('Login efetuado com sucesso')
-                    st.experimental_rerun()
+                    safe_rerun()
