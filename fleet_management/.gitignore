@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.db
+fleet_management.db
+/instance/
+.DS_Store
+.pytest_cache/
+.streamlit/

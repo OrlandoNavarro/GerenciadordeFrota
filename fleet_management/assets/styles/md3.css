@@ -1,0 +1,35 @@
+:root{
+  --md3-primary:#6750A4;
+  --md3-on-primary:#FFFFFF;
+  --md3-secondary:#625B71;
+  --md3-background:#F8F7FB;
+  --md3-surface:#FFFFFF;
+  --md3-surface-variant:#E7E0EC;
+  --md3-outline:#CAC4D0;
+  --md3-text:#1C1B1F;
+  --md3-error:#B3261E;
+  --md3-success:#2E7D32;
+  --md3-warning:#ED6C02;
+  --md3-info:#0288D1;
+}
+body {
+  background: var(--md3-background);
+  color: var(--md3-text);
+  font-family: "Inter", "Roboto", sans-serif;
+}
+.card{
+  background:var(--md3-surface);
+  border-radius:12px;
+  box-shadow: 0 1px 4px rgba(16,24,40,0.06);
+  padding:16px;
+}
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.kpi{
+  background:linear-gradient(180deg, rgba(103,80,164,0.06), rgba(103,80,164,0.02));
+  padding:12px;
+  border-radius:10px;
+}
