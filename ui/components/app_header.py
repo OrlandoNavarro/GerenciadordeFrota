@@ -19,7 +19,7 @@ def render_header():
         else:
             st.markdown('<div style="width:48px;height:48px;background:#eee;border-radius:8px"></div>', unsafe_allow_html=True)
     with cols[1]:
-        st.markdown('<h3 style="margin:0;">Fleet Management</h3>', unsafe_allow_html=True)
+        st.markdown('<h3 style="margin:0;">Gerenciador de Frota</h3>', unsafe_allow_html=True)
     with cols[2]:
         user = current_user()
         if user:

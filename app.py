@@ -24,7 +24,7 @@ from ui.pages.settings_page import render as render_settings
 
 
 def main():
-    st.set_page_config(page_title='Fleet Management', layout='wide')
+    st.set_page_config(page_title='Gerenciador de Frota', layout='wide')
     init_session()
 
     # Initialize DB if needed

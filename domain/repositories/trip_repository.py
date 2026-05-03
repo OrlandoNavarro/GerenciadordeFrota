@@ -17,7 +17,7 @@ class TripRepository:
             transporter_id=payload.get('transporter_id'),
             tipo_carga=payload.get('tipo_carga'),
             peso=payload.get('peso'),
-            custo=payload.get('custo'),
+            valor_frete=payload.get('valor_frete'),
             status=payload.get('status', 'planejada'),
             observacoes=payload.get('observacoes'),
         )

@@ -1,0 +1,340 @@
+2026-05-02 22:13:56.612 
+Warning: the config option 'server.enableCORS=false' is not compatible with
+'server.enableXsrfProtection=true'.
+As a result, 'server.enableCORS' is being overridden to 'true'.
+
+More information:
+In order to protect against CSRF attacks, we send a cookie with each request.
+To do so, we must specify allowable origins, which places a restriction on
+cross-origin resource sharing.
+
+If cross origin resource sharing is required, please disable server.enableXsrfProtection.
+            
+2026-05-02 22:13:57.643 Uvicorn server started on 0.0.0.0:8501
+2026-05-02 22:44:35.087 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 22, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 50, in render_current
+    render_drivers()
+  File "/workspaces/GerenciadordeFrota/ui/pages/drivers_page.py", line 89, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:45:08.133 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 46, in render_current
+    render_transporters()
+  File "/workspaces/GerenciadordeFrota/ui/pages/transporters_page.py", line 76, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:45:25.973 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 50, in render_current
+    render_drivers()
+  File "/workspaces/GerenciadordeFrota/ui/pages/drivers_page.py", line 89, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:45:33.179 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 48, in render_current
+    render_vehicles()
+  File "/workspaces/GerenciadordeFrota/ui/pages/vehicles_page.py", line 86, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:46:23.037 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 46, in render_current
+    render_transporters()
+  File "/workspaces/GerenciadordeFrota/ui/pages/transporters_page.py", line 76, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:46:39.186 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 48, in render_current
+    render_vehicles()
+  File "/workspaces/GerenciadordeFrota/ui/pages/vehicles_page.py", line 86, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:46:52.399 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 48, in render_current
+    render_vehicles()
+  File "/workspaces/GerenciadordeFrota/ui/pages/vehicles_page.py", line 86, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:46:53.464 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: trips.valor_frete
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 52, in render_current
+    render_trips()
+  File "/workspaces/GerenciadordeFrota/ui/pages/trips_page.py", line 99, in render
+    trips = tsvc.list_trips()
+            ^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/domain/services/trip_service.py", line 13, in list_trips
+    return self.repo.list(filters)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/domain/repositories/trip_repository.py", line 42, in list
+    return q.order_by(Trip.id.desc()).all()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2711, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/orm/query.py", line 2864, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/orm/context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 527, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2363, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 952, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: trips.valor_frete
+[SQL: SELECT trips.id AS trips_id, trips.origem AS trips_origem, trips.destino AS trips_destino, trips.data_saida AS trips_data_saida, trips.data_prevista_chegada AS trips_data_prevista_chegada, trips.data_chegada AS trips_data_chegada, trips.motorista_id AS trips_motorista_id, trips.vehicle_id AS trips_vehicle_id, trips.transporter_id AS trips_transporter_id, trips.tipo_carga AS trips_tipo_carga, trips.peso AS trips_peso, trips.valor_frete AS trips_valor_frete, trips.status AS trips_status, trips.observacoes AS trips_observacoes 
+FROM trips ORDER BY trips.id DESC]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2026-05-02 22:47:06.554 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 54, in render_current
+    render_fuelings()
+  File "/workspaces/GerenciadordeFrota/ui/pages/fueling_page.py", line 95, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:47:20.001 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 56, in render_current
+    render_maintenances()
+  File "/workspaces/GerenciadordeFrota/ui/pages/maintenance_page.py", line 84, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+2026-05-02 22:47:22.229 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 70, in <module>
+    main()
+  File "/workspaces/GerenciadordeFrota/app.py", line 66, in main
+    render_shell(render_current)
+  File "/workspaces/GerenciadordeFrota/ui/layout/page_shell.py", line 25, in render_shell
+    content_callable()
+  File "/workspaces/GerenciadordeFrota/app.py", line 56, in render_current
+    render_maintenances()
+  File "/workspaces/GerenciadordeFrota/ui/pages/maintenance_page.py", line 84, in render
+    params = st.experimental_get_query_params()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'streamlit' has no attribute 'experimental_get_query_params'
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+Invalid HTTP request received.
+2026-05-02 23:07:23.148 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 20, in <module>
+    from ui.pages.maintenance_page import render as render_maintenances
+  File "/workspaces/GerenciadordeFrota/ui/pages/maintenance_page.py", line 114
+    rows_all = [m.to_dict() for m in maints]
+IndentationError: unexpected indent
+2026-05-02 23:07:43.114 Uncaught app execution
+Traceback (most recent call last):
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py", line 129, in exec_func_with_error_handling
+    result = func()
+             ^^^^^^
+  File "/workspaces/GerenciadordeFrota/.venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 689, in code_to_exec
+    exec(code, module.__dict__)  # noqa: S102
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspaces/GerenciadordeFrota/app.py", line 20, in <module>
+    from ui.pages.maintenance_page import render as render_maintenances
+  File "/workspaces/GerenciadordeFrota/ui/pages/maintenance_page.py", line 114
+    rows_all = [m.to_dict() for m in maints]
+IndentationError: unexpected indent

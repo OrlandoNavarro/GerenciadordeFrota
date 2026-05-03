@@ -4,6 +4,7 @@ from domain.services.fueling_service import FuelingService
 from domain.services.vehicle_service import VehicleService
 from domain.services.driver_service import DriverService
 from ui.components.data_table import render_table
+from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 from datetime import date
 
@@ -17,22 +18,42 @@ def render():
     vsvc = VehicleService(db)
     dsvc = DriverService(db)
 
+    # Checar se há query param de edição
+    params = get_query_params()
+    edit_fuel_id = None
+    edit_fuel_obj = None
+    if params.get('edit_fueling'):
+        try:
+            edit_fuel_id = int(params.get('edit_fueling')[0])
+            edit_fuel_obj = fsvc.get_fueling(edit_fuel_id)
+        except Exception:
+            edit_fuel_id = None
+            edit_fuel_obj = None
+
     with tabs[0]:
         section('Registro de Abastecimento')
         with st.form('fuel_form'):
-            data = st.date_input('Data', value=date.today())
+            data = st.date_input('Data', value=edit_fuel_obj.data if edit_fuel_obj and edit_fuel_obj.data else date.today())
             veiculos = vsvc.list_vehicles()
             veic_options = ['Nenhum'] + [f"{v.id} - {v.placa}" for v in veiculos]
-            veic = st.selectbox('Veículo', veic_options)
+            if edit_fuel_obj and edit_fuel_obj.vehicle_id:
+                pre_veic = f"{edit_fuel_obj.vehicle_id} - {next((v.placa for v in veiculos if v.id == edit_fuel_obj.vehicle_id), '')}"
+                veic = st.selectbox('Veículo', veic_options, index=veic_options.index(pre_veic) if pre_veic in veic_options else 0)
+            else:
+                veic = st.selectbox('Veículo', veic_options)
             drivers = dsvc.list_drivers()
             driver_options = ['Nenhum'] + [f"{d.id} - {d.nome}" for d in drivers]
-            motorista = st.selectbox('Motorista', driver_options)
-            posto = st.text_input('Posto')
-            litros = st.number_input('Litros', value=0.0, min_value=0.0, format="%.3f")
-            valor_total = st.number_input('Valor total', value=0.0, min_value=0.0, format="%.2f")
-            valor_por_litro = st.number_input('Valor por litro (opcional)', value=0.0, min_value=0.0, format="%.4f")
-            km_atual = st.number_input('KM atual', value=0.0, min_value=0.0, format="%.1f")
-            observacoes = st.text_area('Observações')
+            if edit_fuel_obj and edit_fuel_obj.motorista_id:
+                pre_driver = f"{edit_fuel_obj.motorista_id} - {next((d.nome for d in drivers if d.id == edit_fuel_obj.motorista_id), '')}"
+                motorista = st.selectbox('Motorista', driver_options, index=driver_options.index(pre_driver) if pre_driver in driver_options else 0)
+            else:
+                motorista = st.selectbox('Motorista', driver_options)
+            posto = st.text_input('Posto', value=edit_fuel_obj.posto if edit_fuel_obj else '')
+            litros = st.number_input('Litros', value=edit_fuel_obj.litros or 0.0 if edit_fuel_obj else 0.0, min_value=0.0, format="%.3f")
+            valor_total = st.number_input('Valor total', value=edit_fuel_obj.valor_total or 0.0 if edit_fuel_obj else 0.0, min_value=0.0, format="%.2f")
+            valor_por_litro = st.number_input('Valor por litro (opcional)', value=edit_fuel_obj.valor_por_litro or 0.0 if edit_fuel_obj else 0.0, min_value=0.0, format="%.4f")
+            km_atual = st.number_input('KM atual', value=edit_fuel_obj.km_atual or 0.0 if edit_fuel_obj else 0.0, min_value=0.0, format="%.1f")
+            observacoes = st.text_area('Observações', value=edit_fuel_obj.observacoes if edit_fuel_obj else '')
             submitted = st.form_submit_button('Salvar')
             if submitted:
                 vehicle_id = None
@@ -53,9 +74,22 @@ def render():
                     'observacoes': observacoes,
                 }
                 try:
-                    fsvc.create_fueling(payload)
-                    db.commit()
-                    st.success('Abastecimento registrado')
+                    if edit_fuel_obj:
+                        fsvc.update_fueling(edit_fuel_obj.id, payload)
+                        db.commit()
+                        try:
+                            st.query_params.clear()
+                        except Exception:
+                            pass
+                        st.success('Abastecimento atualizado')
+                        try:
+                            st.rerun()
+                        except Exception:
+                            pass
+                    else:
+                        fsvc.create_fueling(payload)
+                        db.commit()
+                        st.success('Abastecimento registrado')
                 except Exception as e:
                     db.rollback()
                     st.error(str(e))
@@ -90,11 +124,25 @@ def render():
             fuels = fsvc.list_fuelings()
 
         rows = [f.to_dict() for f in fuels]
-        render_table(rows, columns=['id', 'data', 'vehicle_id', 'motorista_id', 'posto', 'litros', 'valor_total', 'valor_por_litro', 'km_atual'])
+        render_table(rows, columns=['id', 'data', 'vehicle_id', 'motorista_id', 'posto', 'litros', 'valor_total', 'valor_por_litro', 'km_atual'], entity='fueling')
+
+        params = get_query_params()
+        edit_id = None
+        if params.get('edit_fueling'):
+            try:
+                edit_id = int(params.get('edit_fueling')[0])
+            except Exception:
+                edit_id = None
 
         options = [f"{f.id} - {f.posto or '-'} | {f.data}" for f in fuels]
         if options:
-            sel = st.selectbox('Selecionar abastecimento', options, key='sel_fuel')
+            index = 0
+            if edit_id is not None:
+                for i, f in enumerate(fuels):
+                    if f.id == edit_id:
+                        index = i
+                        break
+            sel = st.selectbox('Selecionar abastecimento', options, index=index, key='sel_fuel')
             sel_id = int(sel.split(' - ')[0])
             fuel = fsvc.get_fueling(sel_id)
             if fuel:

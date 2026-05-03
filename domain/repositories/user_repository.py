@@ -30,3 +30,22 @@ class UserRepository:
 
     def list(self, skip: int = 0, limit: int = 100):
         return self.db.query(User).offset(skip).limit(limit).all()
+
+    def update_user(self, id: int, payload: dict):
+        u = self.get_by_id(id)
+        if not u:
+            return None
+        if 'email' in payload and payload['email'] != u.email:
+            existing = self.get_by_email(payload['email'])
+            if existing and existing.id != id:
+                raise ValueError('Email already exists')
+        if 'full_name' in payload:
+            u.full_name = payload['full_name']
+        if 'password' in payload and payload['password']:
+            u.password_hash = bcrypt.hash(payload['password'])
+        if 'role' in payload:
+            u.role = payload['role']
+        if 'is_active' in payload:
+            u.is_active = bool(payload['is_active'])
+        self.db.flush()
+        return u
