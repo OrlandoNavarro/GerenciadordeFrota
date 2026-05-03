@@ -178,6 +178,50 @@ def render():
                                 pass
                         except Exception as e:
                             st.error(str(e))
+        else:
+            # Campo de edição abaixo da tabela (comportamento padronizado)
+            options = [f"{t.id} - {t.razao_social} - {t.cnpj or ''}" for t in transporters]
+            if options:
+                sel = st.selectbox('Selecionar transportadora para editar', options, key='sel_transporter')
+                sel_id = int(sel.split(' - ')[0])
+                tr = svc.get_transporter(sel_id)
+                if tr:
+                    st.markdown('### Editar Transportadora')
+                    with st.form('edit_transp_form'):
+                        e_razao = st.text_input('Razão Social', value=tr.razao_social or '')
+                        e_fantasia = st.text_input('Nome Fantasia', value=tr.nome_fantasia or '')
+                        e_cnpj = st.text_input('CNPJ', value=tr.cnpj or '')
+                        e_resp = st.text_input('Responsável', value=tr.responsavel or '')
+                        e_tel = st.text_input('Telefone', value=tr.telefone or '')
+                        e_email = st.text_input('E-mail', value=tr.email or '')
+                        e_cidade = st.text_input('Cidade', value=tr.cidade or '')
+                        e_estado = st.text_input('Estado', value=tr.estado or '')
+                        e_status = st.selectbox('Status', ['ativo', 'inativo'], index=0 if tr.status == 'ativo' else 1)
+                        e_obs = st.text_area('Observações', value=tr.observacoes or '')
+                        updated = st.form_submit_button('Salvar alterações')
+                        if updated:
+                            payload = {
+                                'razao_social': e_razao,
+                                'nome_fantasia': e_fantasia,
+                                'cnpj': e_cnpj,
+                                'responsavel': e_resp,
+                                'telefone': e_tel,
+                                'email': e_email,
+                                'cidade': e_cidade,
+                                'estado': e_estado,
+                                'status': e_status,
+                                'observacoes': e_obs,
+                            }
+                            try:
+                                svc.update_transporter(sel_id, payload)
+                                try:
+                                    st.query_params.clear()
+                                except Exception:
+                                    pass
+                                db.commit()
+                                st.success('Transportadora atualizada')
+                            except Exception as e:
+                                st.error(str(e))
 
     with tabs[2]:
         section('Indicadores')

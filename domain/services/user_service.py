@@ -31,3 +31,12 @@ class UserService:
         if not verify_password(password, pw):
             return None
         return user
+
+    def get_user(self, id: int):
+        return self.repo.get_by_id(id)
+
+    def list_users(self, skip: int = 0, limit: int = 100):
+        return self.repo.list(skip=skip, limit=limit)
+
+    def update_user(self, id: int, payload: dict):
+        return self.repo.update_user(id, payload)

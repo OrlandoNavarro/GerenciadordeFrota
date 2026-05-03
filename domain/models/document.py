@@ -19,6 +19,11 @@ class Document(Base):
         return {
             'id': self.id,
             'tipo_documento': self.tipo_documento,
+            'categoria_referencia': self.categoria_referencia,
+            'referencia_id': self.referencia_id,
             'numero': self.numero,
+            'data_emissao': self.data_emissao,
+            'data_vencimento': self.data_vencimento,
             'status': self.status,
+            'observacoes': self.observacoes,
         }

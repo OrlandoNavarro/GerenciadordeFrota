@@ -6,6 +6,7 @@ from ui.components.data_table import render_table
 from ui.components.query_params import get_query_params
 from ui.components.form_section import section
 from datetime import date
+import math
 
 
 def render():
@@ -110,18 +111,18 @@ def render():
             maints = msvc.list_maintenances()
 
         rows = [m.to_dict() for m in maints]
-            # Paginação
-            rows_all = [m.to_dict() for m in maints]
-            page_size = 10
-            page_key = 'page_maintenance'
-            if page_key not in st.session_state:
-                st.session_state[page_key] = 1
-            params = get_query_params()
-            if params.get(page_key):
-                try:
-                    st.session_state[page_key] = int(params.get(page_key)[0])
-                except Exception:
-                    pass
+        # Paginação
+        rows_all = [m.to_dict() for m in maints]
+        page_size = 10
+        page_key = 'page_maintenance'
+        if page_key not in st.session_state:
+            st.session_state[page_key] = 1
+        params = get_query_params()
+        if params.get(page_key):
+            try:
+                st.session_state[page_key] = int(params.get(page_key)[0])
+            except Exception:
+                pass
 
             total_pages = max(1, math.ceil(len(rows_all) / page_size))
             if total_pages > 1:

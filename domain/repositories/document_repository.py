@@ -20,6 +20,42 @@ class DocumentRepository:
         self.db.flush()
         return d
 
+    def get(self, id: int):
+        return self.db.query(Document).filter(Document.id == id).first()
+
     def list(self, filters: dict | None = None):
         q = self.db.query(Document)
-        return q.all()
+        if filters:
+            if 'tipo_documento' in filters and filters.get('tipo_documento'):
+                q = q.filter(Document.tipo_documento.ilike(f"%{filters['tipo_documento']}%"))
+            if 'numero' in filters and filters.get('numero'):
+                q = q.filter(Document.numero.ilike(f"%{filters['numero']}%"))
+            if 'status' in filters and filters.get('status'):
+                q = q.filter(Document.status == filters['status'])
+            if 'categoria_referencia' in filters and filters.get('categoria_referencia'):
+                q = q.filter(Document.categoria_referencia == filters['categoria_referencia'])
+            if 'referencia_id' in filters and filters.get('referencia_id') is not None:
+                q = q.filter(Document.referencia_id == filters['referencia_id'])
+            if 'date_from' in filters and filters.get('date_from'):
+                q = q.filter(Document.data_emissao >= filters['date_from'])
+            if 'date_to' in filters and filters.get('date_to'):
+                q = q.filter(Document.data_emissao <= filters['date_to'])
+        return q.order_by(Document.id.desc()).all()
+
+    def update(self, id: int, payload: dict):
+        d = self.get(id)
+        if not d:
+            return None
+        for k, v in payload.items():
+            if hasattr(d, k) and k != 'id':
+                setattr(d, k, v)
+        self.db.flush()
+        return d
+
+    def delete(self, id: int):
+        d = self.get(id)
+        if not d:
+            return False
+        d.status = 'cancelado'
+        self.db.flush()
+        return True

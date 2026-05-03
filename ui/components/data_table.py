@@ -3,12 +3,14 @@ import pandas as pd
 
 
 def render_table(rows: list[dict], columns: list[str] | None = None, entity: str | None = None):
-    """Renderiza uma tabela no estilo planilha. Se `entity` for fornecido e a coluna
-    `id` estiver presente, substitui a coluna `id` por uma coluna `Editar` com um
-    link/ícone que adiciona um parâmetro de query `edit_<entity>=<id>` na URL.
+    """Renderiza uma tabela no estilo planilha.
 
-    Observação: manter o layout o mais próximo possível do `st.dataframe`, mas usar
-    HTML para permitir links clicáveis por linha.
+    Observações:
+    - Não insere mais automaticamente a coluna "Editar" na planilha. O comportamento
+      de edição deve ser tratado pelas páginas (por exemplo, com um `selectbox` abaixo
+      da tabela ou via query params). Isso remove a coluna visual "Editar" da planilha.
+    - Usa HTML+CSS para um layout mais agradável sobre a tabela (bordas, cabeçalho
+      destacado e espaçamento).
     """
     if not rows:
         st.info('Nenhum registro encontrado')
@@ -17,46 +19,21 @@ def render_table(rows: list[dict], columns: list[str] | None = None, entity: str
     df = pd.DataFrame(rows)
     if columns:
         # Reindex to the requested columns so missing columns are added as NaN
-        # (avoids KeyError when some rows don't include every key)
         df = df.reindex(columns=columns)
 
-    # If entity provided and id column exists, render HTML table with Edit links
-    if entity and 'id' in df.columns:
-        # build edit column with anchor links that set a query param
-        # try to preserve current page if available in session state
-        page_key = f'page_{entity}'
-        current_page = 1
-        try:
-            current_page = int(st.session_state.get(page_key, 1))
-        except Exception:
-            current_page = 1
+    # Render as HTML (keeps layout consistent across páginas)
+    html_table = df.to_html(escape=False, index=False)
 
-        try:
-            edit_col = df['id'].apply(lambda x: f'<a href="?edit_{entity}={x}&page_{entity}={current_page}" style="text-decoration:none;color:#000;">✎</a>')
-        except Exception:
-            edit_col = df['id'].apply(lambda x: '✎')
+    css = (
+        '<style>'
+        '.st-table-wrapper {padding:8px; border:1px solid #e6e9ef; border-radius:8px; box-shadow:0 1px 2px rgba(0,0,0,0.03); background:#fff; overflow:auto;}'
+        '.st-table-wrapper table {border-collapse: collapse; width:100%; font-family: inherit; table-layout: auto;}'
+        '.st-table-wrapper thead th {background:#f6f7fb; font-weight:600; padding:10px; text-align:left; border-bottom:1px solid #eaeef3;}'
+        '.st-table-wrapper tbody td {padding:10px; border-bottom:1px solid #f1f3f5;}'
+        '.st-table-wrapper tbody tr:nth-child(even) {background:#fbfbfd;}'
+        '.st-table-wrapper a {color:#0d6efd; text-decoration:none;}'
+        '.st-table-wrapper a:hover {text-decoration:underline;}'
+        '</style>'
+    )
 
-        cols = list(df.columns)
-        id_index = cols.index('id')
-
-        df2 = df.copy()
-        # insert 'Editar' at the id position then drop original id
-        df2.insert(id_index, 'Editar', edit_col)
-        df2 = df2.drop(columns=['id'])
-
-        # Render as HTML preserving the cell layout and allowing the link
-        html_table = df2.to_html(escape=False, index=False)
-
-        css = (
-            '<style>'
-            '.st-table-wrapper table {border-collapse: collapse; width:100%; font-family: inherit;}'
-            '.st-table-wrapper th, .st-table-wrapper td {padding:8px; border-bottom:1px solid #eee; text-align:left;}'
-            '.st-table-wrapper tr:nth-child(even) {background:#fafafa;}'
-            '.st-table-wrapper a {color: #000;}'
-            '</style>'
-        )
-
-        st.markdown(f'<div class="st-table-wrapper">{css}{html_table}</div>', unsafe_allow_html=True)
-    else:
-        # fallback to the dataframe view (keeps look & feel)
-        st.dataframe(df)
+    st.markdown(f'<div class="st-table-wrapper">{css}{html_table}</div>', unsafe_allow_html=True)
